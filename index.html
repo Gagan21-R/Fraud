@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FraudShield AI</title>
+  <meta name="description" content="AI-powered fraud detection system using a hybrid Logistic Regression + Isolation Forest engine with explainable risk scores.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css?v=4">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%235a67f2' d='M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5z'/></svg>">
+</head>
+<body>
+<!-- SVG icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M6 15h4"/></symbol>
+    <symbol id="i-rupee" viewBox="0 0 24 24"><path d="M6 4h12M6 9h12M14 4c3 0 4 2.5 4 5s-2 5-6 5H7l9 7"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 4h3v16H7zM14 4h3v16h-3z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></symbol>
+    <symbol id="i-moon2" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9-9-9z"/><circle cx="8" cy="8" r="1.5"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7L20 8"/><path d="M20 3v5h-5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  </defs>
+</svg>
+
+<div class="loader" id="loader">
+  <div class="loader-card">
+    <div class="spinner"><svg class="ic"><use href="#i-shield"/></svg></div>
+    <p id="loaderText">Starting FraudShield AI…</p>
+    <small>Training runs entirely in your browser</small>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo"><svg class="ic"><use href="#i-shield"/></svg></div>
+      <div><b>FraudShield AI</b><small>Hybrid fraud detection</small></div>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="nav-item active" data-view="dashboard"><svg class="ic"><use href="#i-grid"/></svg>Dashboard</button>
+      <button class="nav-item" data-view="monitor"><svg class="ic"><use href="#i-pulse"/></svg>Live Monitor<span class="live-dot" id="navLive"></span></button>
+      <button class="nav-item" data-view="analyzer"><svg class="ic"><use href="#i-search"/></svg>Analyzer</button>
+      <button class="nav-item" data-view="transactions"><svg class="ic"><use href="#i-list"/></svg>Transactions</button>
+      <button class="nav-item" data-view="batch"><svg class="ic"><use href="#i-upload"/></svg>Batch Scan</button>
+      <button class="nav-item" data-view="model"><svg class="ic"><use href="#i-cpu"/></svg>AI Model Lab</button>
+      <button class="nav-item" data-view="about"><svg class="ic"><use href="#i-info"/></svg>How It Works</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="model-chip">
+        <span class="pulse"></span>
+        <div><b id="chipAuc">Model ready</b><small id="chipInfo">—</small></div>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="ic sun"><use href="#i-sun"/></svg>
+        <span class="knob"></span>
+        <svg class="ic moon"><use href="#i-moon"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main>
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu"><svg class="ic"><use href="#i-menu"/></svg></button>
+      <div class="title">
+        <h1 id="viewTitle">Fraud Overview</h1>
+        <p id="viewSub">AI-scored activity across all customer accounts</p>
+      </div>
+      <div class="threshold-chip" title="Decision threshold (change it in AI Model Lab)">
+        <svg class="ic"><use href="#i-target"/></svg><span>Threshold <b id="thrChip">0.50</b></span>
+      </div>
+    </header>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section class="view active" id="view-dashboard">
+      <div class="grid kpis">
+        <div class="card kpi"><div class="kpi-icon accent"><svg class="ic"><use href="#i-card"/></svg></div>
+          <div><span class="kpi-label">Transactions analysed</span><strong id="kTotal">–</strong><small id="kTotalSub"></small></div></div>
+        <div class="card kpi"><div class="kpi-icon high"><svg class="ic"><use href="#i-alert"/></svg></div>
+          <div><span class="kpi-label">Blocked as fraud</span><strong id="kBlocked">–</strong><small id="kBlockedSub"></small></div></div>
+        <div class="card kpi"><div class="kpi-icon low"><svg class="ic"><use href="#i-target"/></svg></div>
+          <div><span class="kpi-label">Detection rate</span><strong id="kRecall">–</strong><small id="kRecallSub"></small></div></div>
+        <div class="card kpi"><div class="kpi-icon med"><svg class="ic"><use href="#i-rupee"/></svg></div>
+          <div><span class="kpi-label">Money protected</span><strong id="kSaved">–</strong><small id="kSavedSub"></small></div></div>
+      </div>
+
+      <div class="grid two-1">
+        <div class="card">
+          <div class="card-head"><h3>Flagged transactions per day</h3>
+            <div class="legend"><span><i style="background:var(--high)"></i>Blocked</span><span><i style="background:var(--med)"></i>Review</span></div></div>
+          <canvas class="chart" id="chDaily"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Blocked by category</h3></div>
+          <div class="donut-wrap"><canvas class="chart donut" id="chCat"></canvas><ul class="legend-list" id="lgCat"></ul></div>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="card-head"><h3>Risk alerts by hour of day</h3>
+            <div class="legend"><span><i style="background:var(--accent)"></i>Blocked + review</span></div></div>
+          <canvas class="chart" id="chHour"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Latest high-risk alerts</h3><button class="link-btn" data-goto="transactions">View all →</button></div>
+          <ul class="alert-list" id="alertList"></ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3><svg class="ic sm"><use href="#i-bolt"/></svg> AI-generated insights</h3><small class="muted">Patterns discovered automatically from the scored data</small></div>
+        <div class="insights" id="insights"></div>
+      </div>
+    </section>
+
+    <!-- ===================== LIVE MONITOR ===================== -->
+    <section class="view" id="view-monitor">
+      <div class="card toolbar">
+        <button class="btn primary" id="liveToggle"><svg class="ic"><use href="#i-play"/></svg><span>Start stream</span></button>
+        <div class="seg" id="liveSpeed">
+          <button data-speed="1400" class="on">1×</button><button data-speed="600">2×</button><button data-speed="220">5×</button>
+        </div>
+        <button class="btn" id="liveInject"><svg class="ic"><use href="#i-bolt"/></svg>Simulate attack</button>
+        <button class="btn ghost" id="liveClear">Clear</button>
+        <div class="sim-clock"><span>Simulated time</span><b id="liveClock">--:--</b></div>
+      </div>
+      <div class="grid kpis">
+        <div class="card kpi small"><div><span class="kpi-label">Processed</span><strong id="lvTotal">0</strong></div></div>
+        <div class="card kpi small"><div><span class="kpi-label">Approved</span><strong class="t-low" id="lvApprove">0</strong></div></div>
+        <div class="card kpi small"><div><span class="kpi-label">Sent to review</span><strong class="t-med" id="lvReview">0</strong></div></div>
+        <div class="card kpi small"><div><span class="kpi-label">Blocked</span><strong class="t-high" id="lvBlock">0</strong></div></div>
+      </div>
+      <div class="grid two-1">
+        <div class="card">
+          <div class="card-head"><h3>Live transaction feed</h3><small class="muted">Each payment is scored in &lt; 1 ms</small></div>
+          <ul class="feed" id="feed"><li class="empty">Press <b>Start stream</b> to begin real-time scoring.</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Risk score timeline</h3></div>
+          <canvas class="chart tall" id="chLive"></canvas>
+          <p class="muted small-note">Dashed line = blocking threshold. Spikes above it are stopped instantly.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ANALYZER ===================== -->
+    <section class="view" id="view-analyzer">
+      <div class="grid two-eq">
+        <div class="card">
+          <div class="card-head"><h3>Transaction details</h3></div>
+          <div class="presets">
+            <span class="muted">Try a scenario:</span>
+            <button class="chip-btn" data-preset="normal">🛒 Normal purchase</button>
+            <button class="chip-btn" data-preset="ato">🌍 Account takeover</button>
+            <button class="chip-btn" data-preset="testing">💳 Card testing</button>
+            <button class="chip-btn" data-preset="stolen">🧾 Stolen card</button>
+          </div>
+          <form class="form" id="anForm" autocomplete="off">
+            <label class="field full"><span>Customer</span><select id="anCustomer"></select></label>
+            <div class="profile full" id="anProfile"></div>
+            <label class="field"><span>Amount (₹)</span><input type="number" id="anAmount" min="1" step="1" value="1200"></label>
+            <label class="field"><span>Merchant category</span><select id="anCategory"></select></label>
+            <label class="field"><span>Location</span><select id="anCity"></select></label>
+            <label class="field"><span>Hour of day: <b id="anHourOut">14:00</b></span><input type="range" id="anHour" min="0" max="23" value="14"></label>
+            <div class="field"><span>Channel</span>
+              <div class="seg" id="anChannel"><button type="button" data-v="0" class="on">In-store</button><button type="button" data-v="1">Online</button></div></div>
+            <div class="field"><span>Device</span>
+              <div class="seg" id="anDevice"><button type="button" data-v="0" class="on">Known</button><button type="button" data-v="1">New</button></div></div>
+            <label class="field"><span>Txns in last hour</span><input type="number" id="anVelocity" min="0" max="20" value="0"></label>
+            <label class="field"><span>Minutes since last txn</span><input type="number" id="anRecency" min="0" value="600"></label>
+          </form>
+        </div>
+        <div class="card result-card">
+          <div class="card-head"><h3>AI verdict</h3><span id="anBadge"></span></div>
+          <canvas class="gauge" id="anGauge"></canvas>
+          <div class="split-scores">
+            <div class="mini"><span>Supervised model</span><b id="anP">–</b><small>Logistic Regression probability</small></div>
+            <div class="mini"><span>Anomaly detector</span><b id="anA">–</b><small>Isolation Forest score</small></div>
+          </div>
+          <h4>Why? — top reasons</h4>
+          <ul class="reasons" id="anReasons"></ul>
+          <h4>Feature contributions</h4>
+          <canvas class="chart contrib" id="anContrib"></canvas>
+          <p class="muted small-note">Red bars push the risk up, green bars pull it down.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TRANSACTIONS ===================== -->
+    <section class="view" id="view-transactions">
+      <div class="card toolbar">
+        <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="txSearch" placeholder="Search ID, customer, city…"></label>
+        <select id="txDecision" class="select">
+          <option value="all">All decisions</option><option value="block">Blocked</option><option value="review">Review</option><option value="approve">Approved</option>
+        </select>
+        <select id="txCategory" class="select"></select>
+        <select id="txSort" class="select">
+          <option value="time">Newest first</option><option value="risk">Highest risk</option><option value="amount">Largest amount</option>
+        </select>
+        <span class="muted" id="txCount"></span>
+      </div>
+      <div class="card table-card">
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>ID</th><th>Time</th><th>Customer</th><th class="num">Amount</th><th>Category</th><th>Location</th><th>Channel</th><th>Risk</th><th>Decision</th></tr></thead>
+            <tbody id="txBody"></tbody>
+          </table>
+        </div>
+        <div class="pager" id="txPager"></div>
+      </div>
+    </section>
+
+    <!-- ===================== BATCH ===================== -->
+    <section class="view" id="view-batch">
+      <div class="grid two-1">
+        <div class="card">
+          <label class="drop" id="drop">
+            <input type="file" id="csvInput" accept=".csv,text/csv" hidden>
+            <div class="drop-icon"><svg class="ic"><use href="#i-upload"/></svg></div>
+            <b>Drop a CSV file here or click to browse</b>
+            <span class="muted">The AI will score every row and explain each flag</span>
+          </label>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>CSV format</h3></div>
+          <p class="muted small-note">Required columns (header row):</p>
+          <code class="codeblock">transaction_id, amount, avg_spend, category, hour, usual_hour, distance_km, international, new_device, online, txn_last_hour, mins_since_last</code>
+          <div class="btn-row">
+            <button class="btn" id="sampleCsv"><svg class="ic"><use href="#i-down"/></svg>Download sample CSV</button>
+            <button class="btn primary" id="runSample"><svg class="ic"><use href="#i-play"/></svg>Scan sample now</button>
+          </div>
+        </div>
+      </div>
+      <div id="batchResults" hidden>
+        <div class="grid kpis">
+          <div class="card kpi small"><div><span class="kpi-label">Rows scanned</span><strong id="bTotal">0</strong></div></div>
+          <div class="card kpi small"><div><span class="kpi-label">Approved</span><strong class="t-low" id="bApprove">0</strong></div></div>
+          <div class="card kpi small"><div><span class="kpi-label">Review</span><strong class="t-med" id="bReview">0</strong></div></div>
+          <div class="card kpi small"><div><span class="kpi-label">Blocked</span><strong class="t-high" id="bBlock">0</strong></div></div>
+        </div>
+        <div class="card table-card">
+          <div class="card-head pad"><h3 id="bTitle">Scan results</h3><button class="btn" id="exportCsv"><svg class="ic"><use href="#i-down"/></svg>Export results</button></div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>ID</th><th class="num">Amount</th><th>Category</th><th>Risk</th><th>Decision</th><th>Main reason</th></tr></thead>
+              <tbody id="bBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MODEL LAB ===================== -->
+    <section class="view" id="view-model">
+      <div class="grid kpis five">
+        <div class="card kpi small"><div><span class="kpi-label">Accuracy</span><strong id="mAcc">–</strong></div></div>
+        <div class="card kpi small"><div><span class="kpi-label">Precision</span><strong id="mPrec">–</strong></div></div>
+        <div class="card kpi small"><div><span class="kpi-label">Recall</span><strong id="mRec">–</strong></div></div>
+        <div class="card kpi small"><div><span class="kpi-label">F1 score</span><strong id="mF1">–</strong></div></div>
+        <div class="card kpi small"><div><span class="kpi-label">ROC-AUC</span><strong id="mAuc">–</strong></div></div>
+      </div>
+
+      <div class="card threshold-card">
+        <div>
+          <h3>Decision threshold</h3>
+          <p class="muted small-note">Lower = catch more fraud but more false alarms. Higher = fewer false alarms but some fraud slips through. Auto-tuned on training data to <b id="mAuto">–</b> (best F2 score, which values catching fraud more than avoiding false alarms).</p>
+        </div>
+        <div class="thr-control">
+          <input type="range" id="thrRange" min="0.05" max="0.95" step="0.01">
+          <b id="thrOut">0.50</b>
+          <button class="btn ghost" id="thrReset">Reset</button>
+        </div>
+      </div>
+
+      <div class="grid three">
+        <div class="card">
+          <div class="card-head"><h3>Confusion matrix</h3><small class="muted">test set</small></div>
+          <div class="cm" id="cm"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>ROC curve</h3>
+            <div class="legend"><span><i style="background:var(--accent)"></i>Hybrid</span><span><i style="background:var(--accent2)"></i>LR</span><span><i style="background:var(--med)"></i>IF</span></div></div>
+          <canvas class="chart" id="chRoc"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Training loss</h3><small class="muted">log-loss per epoch</small></div>
+          <canvas class="chart" id="chLoss"></canvas>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="card-head"><h3>Feature importance</h3><small class="muted">learned weights</small></div>
+          <canvas class="chart importance" id="chImp"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Risk score distribution</h3>
+            <div class="legend"><span><i style="background:var(--legit)"></i>Genuine</span><span><i style="background:var(--high)"></i>Fraud</span></div></div>
+          <canvas class="chart importance" id="chDist"></canvas>
+        </div>
+      </div>
+
+      <div class="grid two-1">
+        <div class="card table-card">
+          <div class="card-head pad"><h3>Model comparison</h3><small class="muted">Why a hybrid?</small></div>
+          <div class="table-wrap">
+            <table class="table"><thead><tr><th>Model</th><th>Type</th><th class="num">ROC-AUC</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th></tr></thead>
+              <tbody id="cmpBody"></tbody></table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Retrain the AI</h3></div>
+          <form class="form one" id="retrainForm">
+            <label class="field"><span>Customers: <b id="rtCustOut">250</b></span><input type="range" id="rtCust" min="80" max="400" step="10" value="250"></label>
+            <label class="field"><span>Isolation trees: <b id="rtTreeOut">100</b></span><input type="range" id="rtTrees" min="25" max="200" step="25" value="100"></label>
+            <label class="field"><span>Random seed</span><input type="number" id="rtSeed" value="42"></label>
+            <button class="btn primary full" type="submit"><svg class="ic"><use href="#i-refresh"/></svg>Generate data &amp; retrain</button>
+          </form>
+          <ul class="train-info" id="trainInfo"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ABOUT ===================== -->
+    <section class="view" id="view-about">
+      <div class="card hero">
+        <div class="hero-icon"><svg class="ic"><use href="#i-shield"/></svg></div>
+        <div>
+          <h2>FraudShield AI</h2>
+          <p>An AI-powered fraud detection system that analyses every card transaction against the customer's own behaviour, scores its risk in milliseconds, and explains <i>why</i> it looks suspicious — so banks can stop fraud without blocking genuine customers.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>The problem</h3></div>
+        <p class="prose">Digital payments in India cross billions of transactions every month, and card / UPI fraud grows with them. Fixed rules like "block anything over ₹50,000" miss clever fraud (many small "test" charges) and annoy honest customers (a big but genuine purchase). Fraud is also <b>rare</b> — often under 2% of transactions — so a naive model that says "never fraud" is 98% accurate and completely useless. FraudShield AI learns what <i>normal</i> looks like for each customer and flags what doesn't fit.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>How the AI works — pipeline</h3></div>
+        <ol class="pipeline">
+          <li><span>1</span><b>Transaction data</b><small>Amount, merchant, location, time, device, channel</small></li>
+          <li><span>2</span><b>Feature engineering</b><small>11 behavioural signals: spend ratio, velocity, distance, new device…</small></li>
+          <li><span>3</span><b>Supervised AI</b><small>Logistic Regression learns from labelled fraud cases</small></li>
+          <li><span>4</span><b>Unsupervised AI</b><small>Isolation Forest spots never-seen-before anomalies</small></li>
+          <li><span>5</span><b>Hybrid risk score</b><small>80% LR + 20% IF → score from 0 to 100</small></li>
+          <li><span>6</span><b>Explain &amp; decide</b><small>Approve / Review / Block with human-readable reasons</small></li>
+        </ol>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="card-head"><h3>AI techniques used</h3></div>
+          <dl class="defs">
+            <dt>Logistic Regression (supervised ML)</dt><dd>Trained from scratch with the Adam optimiser, L2 regularisation and class weighting to handle the rare-fraud imbalance. Its weights tell us which behaviours matter most.</dd>
+            <dt>Isolation Forest (unsupervised ML)</dt><dd>An ensemble of random trees that isolates unusual points. Fraud is "few and different", so it gets isolated in fewer splits. It needs no labels, so it can catch brand-new attack patterns.</dd>
+            <dt>Ensemble learning</dt><dd>The two models fail differently: Logistic Regression is precise on fraud patterns it has seen, while Isolation Forest flags anything unusual, even attacks it was never shown. Blending them gives one balanced, robust score. The AI Model Lab compares all three on the same unseen test data.</dd>
+            <dt>Explainable AI (XAI)</dt><dd>Each feature's contribution to the log-odds is shown as a bar chart and turned into plain-English reason codes.</dd>
+            <dt>Threshold optimisation</dt><dd>The blocking threshold is tuned automatically to maximise the recall-weighted F2 score (a missed fraud costs more than a false alarm), and analysts can adjust it live.</dd>
+          </dl>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Features of the system</h3></div>
+          <ul class="checks">
+            <li><b>Dashboard</b> — KPIs, daily trends, category and hourly risk charts, auto-generated insights</li>
+            <li><b>Live Monitor</b> — real-time stream with instant approve / review / block and attack simulation</li>
+            <li><b>Analyzer</b> — score any what-if transaction, with a risk gauge and reason codes</li>
+            <li><b>Transactions</b> — search, filter, sort and review every scored payment, confirm or clear cases</li>
+            <li><b>Batch Scan</b> — upload a CSV and screen thousands of rows at once, export results</li>
+            <li><b>AI Model Lab</b> — accuracy, precision, recall, F1, ROC-AUC, confusion matrix, feature importance, retraining</li>
+            <li><b>Neumorphic UI</b> — soft 3-D interface with light and dark themes, fully responsive</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div class="card">
+          <div class="card-head"><h3>Behavioural signals the AI watches</h3></div>
+          <div class="signal-grid">
+            <div><svg class="ic"><use href="#i-rupee"/></svg><b>Spend ratio</b><small>Amount ÷ customer's average</small></div>
+            <div><svg class="ic"><use href="#i-moon2"/></svg><b>Odd hours</b><small>Night-time &amp; off-routine activity</small></div>
+            <div><svg class="ic"><use href="#i-globe"/></svg><b>Geo-distance</b><small>km from home, international</small></div>
+            <div><svg class="ic"><use href="#i-phone"/></svg><b>Device</b><small>First-seen device fingerprint</small></div>
+            <div><svg class="ic"><use href="#i-bolt"/></svg><b>Velocity</b><small>Bursts of payments per hour</small></div>
+            <div><svg class="ic"><use href="#i-tag"/></svg><b>Merchant risk</b><small>Gift cards, crypto, jewellery…</small></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Benefits</h3></div>
+          <ul class="checks">
+            <li><b>Stops losses early</b> — fraud is blocked before money leaves the account</li>
+            <li><b>Fewer false alarms</b> — judges each customer against their own habits, not one fixed rule</li>
+            <li><b>Catches new attacks</b> — the anomaly detector needs no prior examples</li>
+            <li><b>Transparent</b> — every decision comes with reasons, which supports RBI-style audit and customer disputes</li>
+            <li><b>Fast &amp; scalable</b> — scoring takes under a millisecond per transaction</li>
+            <li><b>Tunable</b> — the bank chooses its own balance of security and convenience</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Fraud patterns simulated</h3></div>
+        <div class="grid three inner">
+          <div class="pattern"><b>🌍 Account takeover</b><p class="muted">A criminal logs in from a new device, often abroad and at night, and makes several high-value purchases at risky merchants.</p></div>
+          <div class="pattern"><b>💳 Card testing</b><p class="muted">A quick burst of tiny online charges to check if stolen card details work, followed by one large cash-out.</p></div>
+          <div class="pattern"><b>🧾 Stolen card</b><p class="muted">A physical card is used in shops for expensive electronics or jewellery — the hardest case, often in the victim's own city.</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Technology stack</h3></div>
+        <div class="stack">
+          <span>HTML5</span><span>CSS3 (Neumorphism)</span><span>JavaScript (ES2020)</span><span>Canvas API charts</span>
+          <span>Logistic Regression (from scratch)</span><span>Isolation Forest (from scratch)</span><span>No server · runs offline</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Transaction detail modal -->
+<div class="modal" id="modal" hidden>
+  <div class="modal-card">
+    <button class="icon-btn close" id="modalClose" aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="js/data.js?v=4"></script>
+<script src="js/models.js?v=4"></script>
+<script src="js/charts.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
+</body>
+</html>
